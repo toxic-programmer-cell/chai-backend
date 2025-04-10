@@ -12,7 +12,7 @@ const app = express();
 // Enable Cross-Origin Resource Sharing (CORS)
 // This allows your backend to handle requests from different origins (e.g., your frontend on another domain or port)
 app.use(cors({
-    origin: process.origin.CORS_ORIGIN, // Allows requests only from the specified origin (defined in .env)
+    origin: process.env.CORS_ORIGIN, // Allows requests only from the specified origin (defined in .env)
     credentials: true                   // Allows cookies and authentication headers to be sent/received across origins
 }))
 
