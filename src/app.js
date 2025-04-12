@@ -16,26 +16,28 @@ app.use(cors({
     credentials: true                   // Allows cookies and authentication headers to be sent/received across origins
 }))
 
-// Parse incoming JSON payloads
 // Limit is set to 16kb to avoid unnecessarily large request bodies
-app.use(express.json({
-    limit: '16kb'
-}))
+app.use(express.json({limit: '16kb'}))
 
 // Parse incoming URL-encoded form data
 // extended: true allows for rich objects and arrays to be encoded
-app.use(express.urlencoded({
-    extended: true,
-    limit: '16kb'
-}))
+app.use(express.urlencoded({ extended: true, limit: '16kb' }))
 
 // Serve static files (like images, CSS, JS) from the "public" directory
 // This lets you expose a folder for client access (e.g., public/images/logo.png)
 app.use(express.static('public'))
 
-// Parse cookies from the HTTP Request header
 // This is useful when working with authentication tokens or session data stored in cookies
 app.use(cookieParser())
+
+
+//Routes import
+import userRouter from './routes/users.routes.js';
+
+//routes decleration
+app.use("/api/v1/users", userRouter)
+
+
 
 
 export { app };
