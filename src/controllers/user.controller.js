@@ -4,6 +4,23 @@ import {User} from "../models/users.models.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import { apiResponse } from "../utils/apiResponse.js";
 
+//@NOTE: GENERATE ACCESS TOKEN AND REFRESH TOKEN METHOD FOR REUSIBILITY
+const generateAccessAndRefreshTokens = async(userId) => {
+    try {
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        await user.save({validateBeforeSave: false})
+
+        return { accessToken, refreshToken }
+    } catch (error) {
+        throw new apiError(500, "Something went wrong when generating access and refresh tokens")
+    }
+}
+
+//@NOTE: REGISTER USER METHOD
 const registerUser = asyncHandler( async (req, res) => {
     //steps to register user
     //get user details from frontend
@@ -82,4 +99,57 @@ const registerUser = asyncHandler( async (req, res) => {
     )
 })
 
-export { registerUser }
+//@NOTE: LOGIN USER METHOD
+const loginUser = asyncHandler(async (req, res) => {
+    //req body -> data
+    //username or email
+    //check user avalible
+    //check password
+    //generate access token and refresh token
+    //send cookies
+    //send response to frontend
+
+    const { email, userName, password } = req.body
+
+    if (!email || !userName) {
+        throw new apiError(400, "email or username is required");
+    }
+
+    //@NOTE: CHECK FOR USER EXISTENCE
+    const user = await User.findOne({
+        $or: [{ email }, { userName }]
+    })
+
+    if(!user){
+        throw new apiError(401, "user not found");
+    }
+
+    const isPasswordvalid = await user.isPasswordCorrect(password)
+
+    if (!isPasswordvalid) {
+        throw new apiError(401, "Invalid password")
+    }
+
+    const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id)
+
+    const loggedInUser = await User.findById(user._id)
+    .select("-password -refreshToken")
+
+    const option = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, option)
+    .cookie("refreshToken", refreshToken)
+    .json(
+        new apiResponse( 200, { user: loggedInUser, accessToken, refreshToken }, "User logged In Successfully" )
+    )
+})
+
+export { 
+    registerUser,
+    loginUser
+ }

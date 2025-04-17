@@ -45,6 +45,7 @@ const userSchema = new Schema({
     }
 }, { timestamps: true })
 
+//@NOTE: HASH THE PASSWORD BEFORE SAVING THE USER, ONLY WHEN USER IS CREATED OR PASSWORD IS MODIFIED
 userSchema.pre("save", async function(next){
     if(!this.isModified("password")) return next()
 
@@ -52,6 +53,7 @@ userSchema.pre("save", async function(next){
     next()
 })
 
+//@NOTE: COUSTEM METHOD (isPasswordCorrect) TO USES BCRYPT TO COMPARE A PLAIN TEXT PASSWORD WITH THE HASHED PASSWORD
 userSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password, this.password)
 }
