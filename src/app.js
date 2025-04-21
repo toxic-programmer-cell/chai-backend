@@ -7,7 +7,7 @@ const app = express();
 
 // ================== MIDDLEWARES & CONFIGURATIONS ==================
 
-// app.use() are used for middleware or configurations
+//NOTE: app.use() are used for middleware or configurations
 
 // Enable Cross-Origin Resource Sharing (CORS)
 // This allows your backend to handle requests from different origins (e.g., your frontend on another domain or port)
@@ -27,14 +27,14 @@ app.use(express.urlencoded({ extended: true, limit: '16kb' }))
 // This lets you expose a folder for client access (e.g., public/images/logo.png)
 app.use(express.static('public'))
 
-// This is useful when working with authentication tokens or session data stored in cookies
+// NOTE:This is useful when working with authentication tokens or session data stored in cookies
 app.use(cookieParser())
 
 
 //Routes import
 import userRouter from './routes/users.routes.js';
 
-//routes decleration
+//NOTE: routes decleration
 app.use("/api/v1/users", userRouter)
 
 

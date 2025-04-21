@@ -1,0 +1,23 @@
+import { apiError } from "../utils/apiError";
+import { asyncHandler } from "../utils/asyncHandler";
+import jwt from "jsonwebtoken";
+import { User } from "../models/users.models.js";
+
+export const verifyJWT = asyncHandler(async (req, res, next) => {
+    const token = req.cookies.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+
+    if (!token) {
+        throw new apiError(401, "No token provided, authorization denied");
+    }
+    //NOTE: 
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    const user = User.findByIdAndDelete(decodedToken._id).select("--password --refreshToken");
+
+    if (!user) {
+        throw new apiError(401, "Token is not valid");
+    }
+
+    req.user = user;
+    next();
+})
