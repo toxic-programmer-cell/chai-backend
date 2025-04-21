@@ -108,10 +108,11 @@ const loginUser = asyncHandler(async (req, res) => {
     //generate access token and refresh token
     //send cookies
     //send response to frontend
-
+    console.log(req.body);
+    
     const { email, userName, password } = req.body
 
-    if (!email || !userName) {
+    if (!(email || userName)) {
         throw new apiError(400, "email or username is required");
     }
 
