@@ -108,7 +108,8 @@ const loginUser = asyncHandler(async (req, res) => {
     //generate access token and refresh token
     //send cookies
     //send response to frontend
-    console.log(req.body);
+    
+    // console.log(req.body);
     
     const { email, userName, password } = req.body
 
