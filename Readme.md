@@ -20,6 +20,7 @@ This is Backend project with JavaScript
         403: Forbidden when user is logged in but not allowed,
         404: Not Found when data or route is missing.
         )
+
 💥 5xx: Server Errors(
         500 Internal Server Error as a fallback error.
         )
