@@ -191,7 +191,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     //Generate access token
     //send response
 
-    const incomingRefreshToken = req.cookies.accessToken || req.body.refreshToken;
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
     //DEBUG
     // console.log("Incoming Refresh Token",incomingRefreshToken);
 
@@ -217,12 +217,17 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             secure: true
         }
     
-        const {accessToken, newRefreshToken} = await generateAccessAndRefreshTokens(user._id)
+        const {accessToken, refreshToken: newRefreshToken} = await generateAccessAndRefreshTokens(user._id)
+        //DEBUG
+        // console.log("access-token", accessToken);
+        // console.log("new refresh token", newRefreshToken);
+        
+        
     
         return res
         .status(200)
-        .cookies(accessToken, option)
-        .cookies(newRefreshToken, option)
+        .cookie("accessToken",accessToken, option)
+        .cookie("refreshToken",newRefreshToken, option)
         .json(
             200,
             {accessToken, refreshToken: newRefreshToken},
