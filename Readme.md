@@ -11,6 +11,7 @@ This is Backend project with JavaScript
         200 OK => for successful GET requests,
         201 =>  Created for successful POST requests.
 )
+
 🚫 3xx: Redirection
 
 ⚠️ 4xx: Client Errors: (
