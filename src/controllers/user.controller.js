@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {apiError} from "../utils/apiError.js";
 import {User} from "../models/users.models.js";
-import {uploadOnCloudinary} from "../utils/cloudinary.js";
+import {deleteFromCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
 
@@ -301,21 +301,30 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     if (!avatarLocalPath) {
         throw new apiError(400, "Avatar file missing")
     }
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    const newAvatar = await uploadOnCloudinary(avatarLocalPath)
 
-    if (!avatar.url) {
+    if (!newAvatar.url) {
         throw new apiError(400, "Error while uploading avatar")
     }
+
+    // Get old avatar before updating
+    const existingUser = await User.findById(req.user?._id);
+    const oldAvatarUrl = existingUser?.avatar;
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
-                avatar: avatar.url
+                avatar: newAvatar.url
             }
         },
         {new: true}
     ).select("-password")
+
+    // ✅ Delete old avatar after DB update is successful
+    if (user && oldAvatarUrl) {
+        await deleteFromCloudinary(oldAvatarUrl);
+    }
 
     return res
     .status(200)
